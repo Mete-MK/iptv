@@ -1,31 +1,38 @@
 IPTV Player als WebApp installieren
 ===================================
 
-Inhalt dieses Ordners (alles zusammen hochladen, Struktur beibehalten):
-  index.html
-  manifest.webmanifest
-  sw.js
-  icons/apple-touch-icon.png, icon-192.png, icon-512.png
+Inhalt (alles zusammen hochladen, Ordnerstruktur beibehalten):
+  index.html, manifest.webmanifest, sw.js, icons/ (3 PNG-Dateien)
 
-1) Hochladen auf einen HTTPS-Webspace (Pflicht für die Installation)
-   Kostenlose Möglichkeiten:
-   - Netlify Drop: app.netlify.com/drop -> ganzen Ordner "iptv-webapp" hineinziehen
-   - GitHub Pages: neues Repository, alle Dateien hochladen,
-     Settings -> Pages -> Branch "main" aktivieren
-   - Cloudflare Pages oder eigener Webserver
+1) Bereitstellen
+   a) HTTPS-Webspace (Netlify Drop, GitHub Pages, Cloudflare Pages):
+      einfach, aber Safari blockiert dort Streams und Links, die mit http://
+      beginnen. Nur sinnvoll, wenn dein Anbieter https anbietet.
+   b) Über http (nötig bei Links wie http://IP:Port/get.php?...):
+      Ordner auf einen eigenen Webserver/NAS legen oder am PC im Ordner
+      "python -m http.server 8000" starten und am iPhone/iPad im selben WLAN
+      http://<PC-IP>:8000 öffnen. Das Installieren auf den Home-Bildschirm
+      funktioniert auch über http.
 
 2) Auf iPhone/iPad installieren
-   - Die Adresse in SAFARI öffnen (nicht in einem anderen Browser).
-   - Teilen-Symbol -> "Zum Home-Bildschirm" -> "Hinzufügen".
-   - Ab jetzt startet der Player wie eine App im Vollbild.
+   Adresse in SAFARI öffnen -> Teilen-Symbol -> "Zum Home-Bildschirm".
 
-3) Erster Start
-   - Zahnrad -> M3U-Link einfügen -> "Liste laden".
-   - Geht der Link nicht (CORS), im Zahnrad-Menü Text einfügen oder Datei wählen.
+3) Listen hinzufügen (Zahnrad)
+   - M3U-Link eintragen und "Link laden" (klappt nur, wenn der Anbieter es erlaubt)
+   - ODER "Datei importieren": mehrere M3U-Dateien gleichzeitig möglich
+   - ODER Listentext einfügen
+   Mehrere Listen werden gespeichert; oben links wechselst du zwischen ihnen.
 
-Wichtig
-   - Streams mit http:// werden auf einer https-Seite von Safari blockiert.
-     Nutze https-Streams oder hoste die Seite über http.
-   - iOS spielt nur HLS (.m3u8). Bei Xtream-Zugängen "output=m3u8" verwenden.
-   - Nach einer Aktualisierung der Dateien die App einmal komplett schließen
-     und neu öffnen, damit die neue Version geladen wird.
+   Link als Datei sichern (empfohlen bei get.php-Links):
+   Den Link in Safari öffnen -> Download -> in "Dateien" ablegen ->
+   im Player "Datei importieren" und die Datei wählen.
+
+4) Hinweise
+   - iPhone/iPad spielen kein rohes MPEG-TS (.ts). Der Player wandelt Xtream-
+     Sender-Links deshalb automatisch auf .m3u8 (HLS) um. Bei Problemen die
+     Option im Zahnrad-Menü ausschalten.
+   - Lautstärke: Auf iPhone/iPad erlaubt Apple Webseiten keine Lautstärke-
+     regelung, dort die Seitentasten nutzen. In anderen Browsern gibt es
+     einen Regler.
+   - Nach dem Aktualisieren der Dateien die App einmal komplett schließen
+     und neu öffnen.

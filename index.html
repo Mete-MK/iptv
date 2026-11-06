@@ -98,7 +98,7 @@ svg{display:block}
 @media (min-width:700px){#sheet{align-items:center}.card{border-radius:22px}}
 .card h2{margin:0;font-size:22px}
 .card label{display:flex;flex-direction:column;gap:6px;color:var(--mu);font-size:13px}
-.card input[type=url],.card textarea{width:100%;border:1px solid var(--line);background:var(--bg);color:var(--tx);border-radius:12px;padding:12px;font-size:16px;outline:0}
+.card input[type=url],.card input[type=text],.card textarea{width:100%;border:1px solid var(--line);background:var(--bg);color:var(--tx);border-radius:12px;padding:12px;font-size:16px;outline:0}
 .card input:focus,.card textarea:focus{border-color:var(--ac)}
 .card textarea{height:110px;resize:vertical;font-family:ui-monospace,Menlo,monospace;font-size:13px}
 .btn,.card button{height:44px;padding:0 16px;border-radius:12px;border:1px solid var(--line);background:var(--panel);display:inline-grid;place-items:center}
@@ -115,13 +115,26 @@ svg{display:block}
 #st{margin:0;min-height:1.3em;color:var(--mu);font-size:14px}
 #st.err{color:#ffb4a8}
 #st.ok{color:#9fe3b0}
+#plSel{appearance:none;-webkit-appearance:none;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23948fb0' stroke-width='2'/%3E%3C/svg%3E") no-repeat right 2px center;border:0;color:var(--tx);font-size:20px;font-weight:700;font-family:inherit;padding:0 22px 0 0;max-width:100%;outline:0;letter-spacing:-.01em;text-overflow:ellipsis}
+#lists{display:flex;flex-direction:column;gap:8px}
+.lr{display:flex;align-items:center;border:1px solid var(--line);border-radius:12px;background:var(--panel);padding-right:4px}
+.lr.on{border-color:var(--ac)}
+.lr .use{flex:1;min-width:0;height:auto;border:0;background:transparent;text-align:left;padding:8px 12px;display:block}
+.lr .use b{display:block;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lr .use small{color:var(--mu)}
+.lr .ib{width:38px;height:38px;padding:0;border:0;background:transparent;color:var(--mu)}
+.card h3{margin:6px 0 0;font-size:15px;color:var(--mu);font-weight:600}
+.chk{flex-direction:row!important;align-items:flex-start;gap:10px!important;color:var(--tx)!important;font-size:14px!important}
+.chk input{width:20px;height:20px;margin:1px 0 0;accent-color:var(--ac);flex:none}
+#vol{width:90px;accent-color:var(--ac)}
+.mini #vol{display:none}
 </style>
 </head>
 <body>
 <div id="app" class="side-left">
   <aside id="side">
     <header>
-      <div class="brand">IPTV<small id="cnt">Keine Liste geladen</small></div>
+      <div class="brand"><select id="plSel" aria-label="Liste wählen"></select><small id="cnt">Keine Liste geladen</small></div>
       <button class="ib" id="bRef" data-i="refresh" aria-label="Liste aktualisieren"></button>
       <button class="ib" id="bSet" data-i="gear" aria-label="Einstellungen"></button>
     </header>
@@ -149,6 +162,7 @@ svg{display:block}
           <button class="cb big" id="bPlay" data-i="pause" aria-label="Wiedergabe"></button>
           <button class="cb" id="bNext" data-i="next" aria-label="Nächster Sender"></button>
           <button class="cb" id="bMute" data-i="vol" aria-label="Ton"></button>
+          <input id="vol" type="range" min="0" max="1" step="0.02" value="1" aria-label="Lautstärke">
         </div>
       </div>
     </div>
@@ -156,20 +170,24 @@ svg{display:block}
 </div>
 
 <div id="sheet"><div class="card">
-  <h2>Senderliste</h2>
-  <label>M3U-Link<input id="iUrl" type="url" inputmode="url" placeholder="https://…/liste.m3u" autocapitalize="off" autocorrect="off"></label>
-  <button class="pri" id="bUrl">Liste laden</button>
+  <h2>Listen</h2>
+  <div id="lists"></div>
+  <h3>Liste hinzufügen</h3>
+  <label>Name (optional)<input id="iName" type="text" placeholder="z. B. Meine Sender"></label>
+  <label>M3U-Link<input id="iUrl" type="url" inputmode="url" placeholder="http://…/get.php?username=…&amp;password=…&amp;type=m3u" autocapitalize="off" autocorrect="off"></label>
+  <div class="row">
+    <button class="pri" id="bUrl">Link laden</button>
+    <label class="btn" style="flex-direction:row;color:var(--tx);font-size:inherit;cursor:pointer">Datei importieren<input id="iFile" type="file" multiple hidden></label>
+  </div>
   <details>
-    <summary>Link geht nicht? Text einfügen oder Datei wählen</summary>
-    <textarea id="iTxt" placeholder="#EXTM3U&#10;#EXTINF:-1 group-title=&quot;News&quot;,Sender&#10;https://…"></textarea>
-    <div class="row">
-      <button id="bTxt">Text laden</button>
-      <label class="btn" style="flex-direction:row;color:var(--tx);font-size:inherit">Datei wählen<input id="iFile" type="file" accept=".m3u,.m3u8,.txt,audio/x-mpegurl,application/vnd.apple.mpegurl" hidden></label>
-    </div>
+    <summary>Listentext einfügen</summary>
+    <textarea id="iTxt" placeholder="#EXTM3U&#10;#EXTINF:-1 group-title=&quot;News&quot;,Sender&#10;http://…"></textarea>
+    <button id="bTxt">Text laden</button>
   </details>
+  <label class="chk"><input type="checkbox" id="cHls"><span>Xtream-Sender als HLS (m3u8) abspielen. Nötig auf iPhone/iPad, wenn deine Liste mit output=mpegts bzw. .ts-Links arbeitet.</span></label>
   <div class="row between"><span>Position der Liste</span><div class="seg" id="sideSeg"><button data-s="left">Links</button><button data-s="right">Rechts</button></div></div>
   <p id="st"></p>
-  <div class="row between"><button id="bDel" class="danger">Liste löschen</button><button id="bShut">Fertig</button></div>
+  <button id="bShut">Fertig</button>
 </div></div>
 
 <script>
@@ -187,6 +205,7 @@ const I={
   close:'M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z',
   gear:'M19.14 12.94c.04-.3.06-.61.06-.94s-.02-.64-.07-.94l2.03-1.58a.5.5 0 0 0 .12-.64l-1.92-3.32a.5.5 0 0 0-.6-.22l-2.39.96a7 7 0 0 0-1.62-.94l-.36-2.54A.48.48 0 0 0 13.9 2h-3.84a.48.48 0 0 0-.48.41l-.36 2.54c-.59.24-1.13.56-1.62.94l-2.39-.96a.48.48 0 0 0-.6.22L2.69 8.87a.48.48 0 0 0 .12.64l2.03 1.58c-.05.3-.07.63-.07.94s.02.64.07.94l-2.03 1.58a.5.5 0 0 0-.12.64l1.92 3.32c.12.22.37.29.6.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.26.41.48.41h3.84c.24 0 .44-.17.48-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.09.47 0 .6-.22l1.92-3.32a.5.5 0 0 0-.12-.64l-2.01-1.58zM12 15.6A3.6 3.6 0 1 1 12 8.4a3.6 3.6 0 0 1 0 7.2z',
   star:'M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z',
+  edit:'M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z',
   refresh:'M17.65 6.35A7.96 7.96 0 0 0 12 4a8 8 0 1 0 7.73 10h-2.08A6 6 0 1 1 12 6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z'
 };
 const ico=n=>`<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="${I[n]}"/></svg>`;
@@ -299,14 +318,17 @@ function stopStream(){
   if(S.hls){S.hls.destroy();S.hls=null}
   v.pause();v.removeAttribute('src');v.load();lock(false);
 }
-function load(u){
+const XT=/^(https?:\/\/[^\/]+\/(?:live\/)?[^\/]+\/[^\/]+\/\d+)(?:\.ts)?(\?.*)?$/i;
+const hlsify=u=>ls('hls')!=='0'&&XT.test(u)?u.replace(XT,'$1.m3u8$2'):u;
+function load(u,raw){
   stopStream();msg('Lädt …');
+  const src=raw?u:hlsify(u);S.alt=src!==u?u:null;
   const native=v.canPlayType('application/vnd.apple.mpegurl');
   if(native||!(window.Hls&&Hls.isSupported())){
-    v.src=u;v.play().catch(()=>{});
+    v.src=src;v.play().catch(()=>{});
   }else{
     const h=new Hls({lowLatencyMode:true});S.hls=h;
-    h.loadSource(u);h.attachMedia(v);
+    h.loadSource(src);h.attachMedia(v);
     h.on(Hls.Events.MANIFEST_PARSED,()=>v.play().catch(()=>{}));
     h.on(Hls.Events.ERROR,(_,d)=>{if(d.fatal)msg('Sender nicht erreichbar. Wähle einen anderen oder versuche es später erneut.',true)});
   }
@@ -338,7 +360,11 @@ v.addEventListener('playing',()=>{msg('');updPlay();lock(true)});
 v.addEventListener('pause',()=>{updPlay();ctl.classList.add('show')});
 v.addEventListener('play',updPlay);
 v.addEventListener('waiting',()=>{if(S.live)msg('Puffert …')});
-v.addEventListener('error',()=>{if(S.live&&!S.hls)msg('Dieser Sender lässt sich hier nicht abspielen.',true)});
+v.addEventListener('error',()=>{
+  if(!S.live||S.hls)return;
+  if(S.alt){const a=S.alt;S.alt=null;load(a,true);return}
+  msg('Dieser Sender lässt sich hier nicht abspielen.',true);
+});
 
 $('#bPlay').onclick=()=>{
   if(!S.live&&S.cur>=0){play(S.cur);return}
@@ -346,7 +372,22 @@ $('#bPlay').onclick=()=>{
 };
 $('#bPrev').onclick=()=>{step(-1)};
 $('#bNext').onclick=()=>{step(1)};
-$('#bMute').onclick=()=>{v.muted=!v.muted;$('#bMute').innerHTML=ico(v.muted?'mute':'vol');poke()};
+const volOK=(()=>{try{const t=document.createElement('video');t.volume=.5;return t.volume===.5}catch(e){return false}})();
+const vol=$('#vol');
+const updVol=()=>{$('#bMute').innerHTML=ico(v.muted||v.volume===0?'mute':'vol')};
+if(volOK){
+  const sv=parseFloat(ls('vol'));if(sv>=0&&sv<=1)v.volume=sv;
+  vol.value=v.volume;
+  vol.addEventListener('input',()=>{v.volume=+vol.value;v.muted=v.volume===0;ls('vol',vol.value);poke()});
+  v.addEventListener('volumechange',updVol);
+}else vol.style.display='none';
+$('#bMute').onclick=()=>{
+  if(!volOK&&!v.muted&&!ls('volhint')){
+    ls('volhint','1');msg('Auf iPhone/iPad regelst du die Lautstärke mit den Seitentasten. Apple erlaubt Webseiten keinen Zugriff darauf.');
+    setTimeout(()=>{if($('#msg').textContent.startsWith('Auf iPhone'))msg('')},4000);
+  }
+  v.muted=!v.muted;updVol();poke();
+};
 
 /* Vollbild */
 function full(){
@@ -422,60 +463,116 @@ addEventListener('keydown',e=>{
   else if(e.key==='ArrowDown')step(1);
 });
 
-/* ---------- Einstellungen ---------- */
+/* ---------- Listen & Einstellungen ---------- */
 const sheet=$('#sheet'),st=(t,c)=>{const p=$('#st');p.textContent=t||'';p.className=c||''};
-const openSheet=()=>{$('#iUrl').value=ls('src')||'';st('');sheet.classList.add('show')};
+const DB=new Promise((res,rej)=>{try{const r=indexedDB.open('iptv',1);r.onupgradeneeded=()=>r.result.createObjectStore('lists',{keyPath:'id'});r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)}catch(e){rej(e)}});
+const tx=(m,f)=>DB.then(db=>new Promise((res,rej)=>{const t=db.transaction('lists',m),q=f(t.objectStore('lists'));t.oncomplete=()=>res(q&&q.result);t.onerror=()=>rej(t.error)}));
+const dbPut=o=>tx('readwrite',s=>s.put(o)).catch(()=>{});
+const dbDel=id=>tx('readwrite',s=>s.delete(id)).catch(()=>{});
+S.lists=[];S.act=null;
+
+const openSheet=()=>{renderLists();$('#cHls').checked=ls('hls')!=='0';st('');sheet.classList.add('show')};
 const closeSheet=()=>sheet.classList.remove('show');
 $('#bSet').onclick=openSheet;$('#bShut').onclick=closeSheet;
 sheet.addEventListener('click',e=>{if(e.target===sheet)closeSheet()});
+$('#cHls').onchange=e=>ls('hls',e.target.checked?'1':'0');
 
-function ingest(t,src,silent){
-  const ch=parse(t);
-  if(!ch.length){st('In dieser Liste wurden keine Sender gefunden.','err');return false}
-  S.ch=ch;S.open.clear();S.cur=-1;
-  if(!silent){
-    ls('text','');ls('text',t);ls('src',src||'');
-  }
-  const last=ls('last'),i=last?ch.findIndex(c=>c.url===last):-1;
-  if(i>=0){S.cur=i;S.open.add(ch[i].group)}
-  render();
-  if(i>=0){const e=document.querySelector(`.ch[data-i="${i}"]`);if(e)e.scrollIntoView({block:'center'})}
-  if(!silent){st(`${ch.length} Sender geladen.`,'ok');setTimeout(closeSheet,500)}
-  return true;
+function chans(rec){
+  let ch=parse(rec.text);
+  if(!ch.length&&rec.src&&/#EXT-X-(STREAM-INF|TARGETDURATION)/.test(rec.text))ch=[{name:rec.name,logo:'',group:'Direkt',url:rec.src}];
+  return ch;
 }
-async function fromUrl(u,silent){
+function renderLists(){
+  const sel=$('#plSel');
+  sel.innerHTML=S.lists.map(l=>`<option value="${l.id}"${l.id===S.act?' selected':''}>${esc(l.name)}</option>`).join('')+`<option value="+">${S.lists.length?'Liste hinzufügen …':'IPTV: Liste hinzufügen …'}</option>`;
+  if(!S.lists.length)sel.value='+';
+  $('#lists').innerHTML=S.lists.map(l=>`<div class="lr${l.id===S.act?' on':''}" data-id="${l.id}"><button class="use"><b>${esc(l.name)}</b><small>${l.n} Sender · ${l.src?'Link':'Datei'}</small></button>${l.src?`<button class="ib" data-a="ref" aria-label="Aktualisieren">${ico('refresh')}</button>`:''}<button class="ib" data-a="ren" aria-label="Umbenennen">${ico('edit')}</button><button class="ib" data-a="del" aria-label="Löschen">${ico('close')}</button></div>`).join('');
+}
+function activate(id){
+  const rec=S.lists.find(l=>l.id===id);if(!rec)return;
+  if(S.live)closePlayer();
+  S.act=id;S.ch=chans(rec);S.open.clear();S.cur=-1;$('#q').value='';ls('active',id);
+  const last=ls('last'),i=last?S.ch.findIndex(c=>c.url===last):-1;
+  if(i>=0){S.cur=i;S.open.add(S.ch[i].group)}
+  render();renderLists();
+  if(i>=0){const e=document.querySelector(`.ch[data-i="${i}"]`);if(e)e.scrollIntoView({block:'center'})}
+}
+async function addList({name,src,text}){
+  let host='Meine Liste';try{if(src)host=new URL(src).hostname}catch(e){}
+  const rec={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),name:(name||'').trim()||host,src:src||'',text,ts:Date.now()};
+  const ch=chans(rec);
+  if(!ch.length){st(`„${rec.name}“: keine Sender gefunden.`,'err');return null}
+  rec.n=ch.length;S.lists.push(rec);await dbPut(rec);return rec;
+}
+async function fromUrl(u,name){
   u=(u||'').trim();
   if(!/^https?:\/\//i.test(u)){st('Bitte einen Link mit http:// oder https:// eingeben.','err');return}
   st('Lädt …');
   try{
-    const r=await fetch(u);if(!r.ok)throw new Error(r.status);
-    ingest(await r.text(),u,silent);
+    const r=await fetch(u);if(!r.ok)throw 0;
+    const rec=await addList({name,src:u,text:await r.text()});
+    if(rec){activate(rec.id);st(`${rec.n} Sender geladen.`,'ok');setTimeout(closeSheet,600)}
   }catch(e){
-    st('Der Link ließ sich nicht laden. Manche Anbieter blockieren fremde Webseiten (CORS). Öffne „Link geht nicht?“ und füge den Listentext ein oder wähle die Datei.','err');
-    if(silent)openSheet();
+    st('Der Link ließ sich nicht laden. Meist erlaubt der Anbieter Webseiten den Zugriff nicht (CORS), oder die Seite läuft über https und der Link über http. Öffne den Link in Safari, sichere die Datei und nutze „Datei importieren“.','err');
   }
 }
-$('#bUrl').onclick=()=>fromUrl($('#iUrl').value);
-$('#bTxt').onclick=()=>{const t=$('#iTxt').value.trim();if(t)ingest(t,'')};
-$('#iFile').onchange=async e=>{const f=e.target.files[0];if(f)ingest(await f.text(),'');e.target.value=''};
-$('#bRef').onclick=()=>{const s=ls('src');s&&/^https?:/i.test(s)?fromUrl(s):openSheet()};
-$('#bDel').onclick=()=>{
-  if(!confirm('Gespeicherte Senderliste wirklich löschen? Favoriten bleiben erhalten.'))return;
-  closePlayer();S.ch=[];S.cur=-1;['text','src','last'].forEach(k=>ls(k,''));render();st('Liste gelöscht.');
+async function refreshList(id){
+  const rec=S.lists.find(l=>l.id===id);if(!rec||!rec.src)return;
+  st('Aktualisiert …');
+  try{
+    const r=await fetch(rec.src);if(!r.ok)throw 0;
+    const old=rec.text;rec.text=await r.text();
+    const ch=chans(rec);if(!ch.length){rec.text=old;throw 0}
+    rec.n=ch.length;rec.ts=Date.now();await dbPut(rec);
+    id===S.act?activate(id):renderLists();
+    st(`${rec.n} Sender aktualisiert.`,'ok');
+  }catch(e){st('Aktualisieren nicht möglich (CORS oder Netz). Importiere die Datei neu.','err')}
+}
+$('#lists').addEventListener('click',e=>{
+  const row=e.target.closest('.lr'),b=e.target.closest('button');if(!row||!b)return;
+  const id=row.dataset.id,a=b.dataset.a,rec=S.lists.find(l=>l.id===id);
+  if(!a){activate(id);closeSheet()}
+  else if(a==='ref')refreshList(id);
+  else if(a==='ren'){const n=prompt('Name der Liste',rec.name);if(n&&n.trim()){rec.name=n.trim();dbPut(rec);renderLists()}}
+  else if(a==='del'){
+    if(!confirm(`Liste „${rec.name}“ löschen? Favoriten bleiben erhalten.`))return;
+    S.lists=S.lists.filter(l=>l.id!==id);dbDel(id);
+    if(S.act===id){closePlayer();S.ch=[];S.cur=-1;S.act=null;ls('active','');S.lists.length?activate(S.lists[0].id):render()}
+    renderLists();
+  }
+});
+$('#plSel').onchange=e=>{const val=e.target.value;val==='+'?openSheet():activate(val)};
+$('#bUrl').onclick=()=>fromUrl($('#iUrl').value,$('#iName').value);
+$('#bTxt').onclick=async()=>{
+  const t=$('#iTxt').value.trim();if(!t)return;
+  const rec=await addList({name:$('#iName').value,src:'',text:t});
+  if(rec){activate(rec.id);st(`${rec.n} Sender geladen.`,'ok');setTimeout(closeSheet,600)}
 };
-function setSide(s){
-  app.classList.remove('side-left','side-right');app.classList.add('side-'+s);ls('side',s);
-  document.querySelectorAll('#sideSeg button').forEach(b=>b.classList.toggle('on',b.dataset.s===s));
+$('#iFile').onchange=async e=>{
+  const files=[...e.target.files];e.target.value='';
+  let first=null,ok=0;
+  for(const f of files){
+    const rec=await addList({name:f.name.replace(/\.[^.]+$/,''),src:'',text:await f.text()});
+    if(rec){ok++;first=first||rec}
+  }
+  if(first){activate(first.id);st(`${ok} Liste${ok>1?'n':''} importiert.`,'ok');setTimeout(closeSheet,700)}
+};
+$('#bRef').onclick=()=>{const r=S.lists.find(l=>l.id===S.act);openSheet();if(r&&r.src)refreshList(r.id)};
+function setSide(sd){
+  app.classList.remove('side-left','side-right');app.classList.add('side-'+sd);ls('side',sd);
+  document.querySelectorAll('#sideSeg button').forEach(b=>b.classList.toggle('on',b.dataset.s===sd));
 }
 $('#sideSeg').addEventListener('click',e=>{const b=e.target.closest('button');if(b)setSide(b.dataset.s)});
 
 /* ---------- Start ---------- */
-setSide(ls('side')||'left');
-(function(){
-  const t=ls('text'),src=ls('src');
-  if(t&&ingest(t,src,true))return;
-  render();
-  if(src&&/^https?:/i.test(src))fromUrl(src,true);else openSheet();
+(async()=>{
+  setSide(ls('side')||'left');
+  try{S.lists=(await tx('readonly',s=>s.getAll()))||[]}catch(e){S.lists=[]}
+  const oldT=ls('text');
+  if(!S.lists.length&&oldT){await addList({name:'Meine Liste',src:ls('src')||'',text:oldT});ls('text','')}
+  const pick=S.lists.find(l=>l.id===ls('active'))||S.lists[0];
+  render();renderLists();
+  if(pick)activate(pick.id);else openSheet();
 })();
 if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
