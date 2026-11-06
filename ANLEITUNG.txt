@@ -9,9 +9,11 @@ Inhalt (alles zusammen hochladen, Ordnerstruktur beibehalten):
       einfach, aber Safari blockiert dort Streams und Links, die mit http://
       beginnen. Nur sinnvoll, wenn dein Anbieter https anbietet.
    b) Über http (nötig bei Links wie http://IP:Port/get.php?...):
-      Ordner auf einen eigenen Webserver/NAS legen oder am PC im Ordner
-      "python -m http.server 8000" starten und am iPhone/iPad im selben WLAN
-      http://<PC-IP>:8000 öffnen. Das Installieren auf den Home-Bildschirm
+      Am PC (Python nötig) Start-Server.bat bzw. start-server.py starten; das
+      Fenster zeigt die Adresse, z. B. http://192.168.x.x:8000. Diese in Safari
+      auf iPhone/iPad (gleiches WLAN) öffnen. Der PC muss laufen, solange du die
+      App startest. Dauerhaft geht es mit NAS, Raspberry Pi oder einem Webhoster,
+      bei dem du https nicht erzwingst. Über http gibt es keinen Offline-Cache. Das Installieren auf den Home-Bildschirm
       funktioniert auch über http.
 
 2) Auf iPhone/iPad installieren

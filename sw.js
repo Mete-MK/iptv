@@ -1,4 +1,4 @@
-const V='iptv-v3';
+const V='iptv-v4';
 const SHELL=['./','index.html','manifest.webmanifest','icons/icon-192.png','icons/icon-512.png','icons/apple-touch-icon.png'];
 const HLS='https://cdnjs.cloudflare.com/ajax/libs/hls.js/';
 self.addEventListener('install',e=>{e.waitUntil(caches.open(V).then(c=>c.addAll(SHELL)).then(()=>self.skipWaiting()))});

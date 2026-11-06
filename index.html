@@ -368,9 +368,7 @@ function fail(){
   else if(w.code===2)t='Netzwerkfehler: Der Server ist nicht erreichbar (Adresse/Port, VPN, Sperre durch den Anbieter?).';
   else if(w.code===3)t='Der Stream ließ sich nicht dekodieren.';
   else t='Format nicht unterstützt: Der Anbieter liefert vermutlich kein HLS (.m3u8), oder der Zugang ist abgelaufen.';
-  m.className='err';m.textContent=t+' ';
-  const a=document.createElement('a');a.href=hlsify(u);a.target='_blank';a.rel='noopener';a.textContent='Testlink öffnen';
-  a.style.cssText='color:#fff;text-decoration:underline;white-space:nowrap';m.append(a);
+  m.className='err';m.textContent=t;
 }
 v.addEventListener('error',()=>{
   if(!S.live||S.hls)return;
