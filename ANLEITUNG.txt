@@ -1,0 +1,31 @@
+IPTV Player als WebApp installieren
+===================================
+
+Inhalt dieses Ordners (alles zusammen hochladen, Struktur beibehalten):
+  index.html
+  manifest.webmanifest
+  sw.js
+  icons/apple-touch-icon.png, icon-192.png, icon-512.png
+
+1) Hochladen auf einen HTTPS-Webspace (Pflicht für die Installation)
+   Kostenlose Möglichkeiten:
+   - Netlify Drop: app.netlify.com/drop -> ganzen Ordner "iptv-webapp" hineinziehen
+   - GitHub Pages: neues Repository, alle Dateien hochladen,
+     Settings -> Pages -> Branch "main" aktivieren
+   - Cloudflare Pages oder eigener Webserver
+
+2) Auf iPhone/iPad installieren
+   - Die Adresse in SAFARI öffnen (nicht in einem anderen Browser).
+   - Teilen-Symbol -> "Zum Home-Bildschirm" -> "Hinzufügen".
+   - Ab jetzt startet der Player wie eine App im Vollbild.
+
+3) Erster Start
+   - Zahnrad -> M3U-Link einfügen -> "Liste laden".
+   - Geht der Link nicht (CORS), im Zahnrad-Menü Text einfügen oder Datei wählen.
+
+Wichtig
+   - Streams mit http:// werden auf einer https-Seite von Safari blockiert.
+     Nutze https-Streams oder hoste die Seite über http.
+   - iOS spielt nur HLS (.m3u8). Bei Xtream-Zugängen "output=m3u8" verwenden.
+   - Nach einer Aktualisierung der Dateien die App einmal komplett schließen
+     und neu öffnen, damit die neue Version geladen wird.
