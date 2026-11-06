@@ -1,0 +1,34 @@
+IPTV Player - Web-App fuer iPhone / iPad (und Browser)
+=======================================================
+
+Inhalt: index.html, manifest.webmanifest, sw.js, icons/, Start-Server.bat, start-server.py
+
+1) Bereitstellen ueber HTTP (wichtig bei http://-Sendern!)
+   - Am PC Start-Server.bat starten (Python noetig). Das Fenster zeigt eine Adresse,
+     z. B. http://192.168.x.x:8000
+   - Diese Adresse in Safari am iPhone/iPad (gleiches WLAN) oeffnen.
+   - Alternativ: Ordner auf einen eigenen Webserver legen, der HTTP ausliefert.
+   (Auf https-Seiten wie Netlify blockiert Safari http-Sender.)
+
+2) Installieren: Safari -> Teilen -> "Zum Home-Bildschirm".
+
+3) Liste hinzufuegen (Zahnrad): M3U-Link, Datei importieren oder Text einfuegen.
+   Bei get.php-Links ist die Datei der sicherste Weg: Link in Safari oeffnen, Datei
+   in "Dateien" sichern, dann "Datei importieren".
+
+4) Struktur: Gruppen werden als Baum angezeigt (z. B. "DE | Sport" = DE > Sport),
+   Trennzeilen wie "#### SPORT ####" werden zu Bereichen, Filme/Serien/Live-TV
+   werden getrennt. Im Zahnrad-Menue laesst sich die Aufteilung abschalten.
+
+5) Fernbedienung / Tastatur (Fire TV im Silk-Browser, iPad-Tastatur)
+   Pfeiltasten  Navigieren       OK/Enter  Auswaehlen / Gruppe oeffnen
+   Zurueck      Fenster schliessen / Vollbild verlassen
+   Menue (=)    Einstellungen    Play/Pause  Wiedergabe
+   Vor/Zurueck-Spulen oder CH+/CH-  naechster/voriger Sender
+   Im Player: OK = Vollbild, Hoch/Runter = Sender wechseln, Rechts = Bedienleiste.
+   Auf dem Fire TV ist die Android-App (IPTV-Android.zip) die bessere Wahl.
+
+6) Hinweise
+   - iPhone/iPad: Lautstaerke nur ueber die Seitentasten (Apple-Beschraenkung).
+   - Xtream-Sender werden automatisch auf .m3u8 (HLS) umgestellt (abschaltbar).
+   - Nach einem Update die App einmal komplett schliessen und neu oeffnen.
