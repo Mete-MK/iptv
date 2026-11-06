@@ -1,0 +1,5 @@
+{"appId":"de.iptvplayer.app","appName":"IPTV Player","webDir":"www",
+"server":{"androidScheme":"http","cleartext":true},
+"android":{"allowMixedContent":true},
+"ios":{"contentInset":"never"},
+"plugins":{"CapacitorHttp":{"enabled":true}}}
