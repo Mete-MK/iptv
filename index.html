@@ -72,7 +72,7 @@ svg{display:block}
 #player.has #ph{display:none}
 #msg{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);text-align:center;padding:0 16px;color:#fff;text-shadow:0 1px 6px #000;pointer-events:none}
 #msg:empty{display:none}
-#msg.err{color:#ffb4a8}
+#msg.err{color:#ffb4a8;pointer-events:auto;font-size:13px}
 #ctl{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:space-between;opacity:0;transition:opacity .2s}
 #ctl.show{opacity:1}
 #ctl:not(.show) button{pointer-events:none}
@@ -320,8 +320,8 @@ function stopStream(){
 }
 const XT=/^(https?:\/\/[^\/]+\/(?:live\/)?[^\/]+\/[^\/]+\/\d+)(?:\.ts)?(\?.*)?$/i;
 const hlsify=u=>ls('hls')!=='0'&&XT.test(u)?u.replace(XT,'$1.m3u8$2'):u;
-function load(u,raw){
-  stopStream();msg('Lädt …');
+function load(u,raw,keep){
+  stopStream();if(!keep)S.why=null;msg('Lädt …');
   const src=raw?u:hlsify(u);S.alt=src!==u?u:null;
   const native=v.canPlayType('application/vnd.apple.mpegurl');
   if(native||!(window.Hls&&Hls.isSupported())){
@@ -330,7 +330,7 @@ function load(u,raw){
     const h=new Hls({lowLatencyMode:true});S.hls=h;
     h.loadSource(src);h.attachMedia(v);
     h.on(Hls.Events.MANIFEST_PARSED,()=>v.play().catch(()=>{}));
-    h.on(Hls.Events.ERROR,(_,d)=>{if(d.fatal)msg('Sender nicht erreichbar. Wähle einen anderen oder versuche es später erneut.',true)});
+    h.on(Hls.Events.ERROR,(_,d)=>{if(d.fatal)fail()});
   }
 }
 function play(i){
@@ -360,12 +360,24 @@ v.addEventListener('playing',()=>{msg('');updPlay();lock(true)});
 v.addEventListener('pause',()=>{updPlay();ctl.classList.add('show')});
 v.addEventListener('play',updPlay);
 v.addEventListener('waiting',()=>{if(S.live)msg('Puffert …')});
+function fail(){
+  const m=$('#msg'),w=S.why||{},u=S.ch[S.cur]?S.ch[S.cur].url:'';
+  const mixed=location.protocol==='https:'&&/^http:/i.test(u);
+  let t;
+  if(mixed)t='Blockiert: Die App läuft über https, der Sender über http. Safari erlaubt das nicht. Stelle die App über http bereit (siehe Anleitung) oder nutze https-Links.';
+  else if(w.code===2)t='Netzwerkfehler: Der Server ist nicht erreichbar (Adresse/Port, VPN, Sperre durch den Anbieter?).';
+  else if(w.code===3)t='Der Stream ließ sich nicht dekodieren.';
+  else t='Format nicht unterstützt: Der Anbieter liefert vermutlich kein HLS (.m3u8), oder der Zugang ist abgelaufen.';
+  m.className='err';m.textContent=t+' ';
+  const a=document.createElement('a');a.href=hlsify(u);a.target='_blank';a.rel='noopener';a.textContent='Testlink öffnen';
+  a.style.cssText='color:#fff;text-decoration:underline;white-space:nowrap';m.append(a);
+}
 v.addEventListener('error',()=>{
   if(!S.live||S.hls)return;
-  if(S.alt){const a=S.alt;S.alt=null;load(a,true);return}
-  msg('Dieser Sender lässt sich hier nicht abspielen.',true);
+  if(!S.why)S.why={code:v.error?v.error.code:0};
+  if(S.alt){const a=S.alt;S.alt=null;load(a,true,true);return}
+  fail();
 });
-
 $('#bPlay').onclick=()=>{
   if(!S.live&&S.cur>=0){play(S.cur);return}
   v.paused?v.play().catch(()=>{}):v.pause();poke();
